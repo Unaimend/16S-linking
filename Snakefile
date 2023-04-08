@@ -170,9 +170,48 @@ rule map_reads_to_bins:
 		read_path={read_folder}
 	output: 
 		#EXPAND OUTPUT AND SEE 
-		expand("{out}/{y}", y = read_bins2(), out=out_folder)
-	script:
-		"scripts/python/run_bbsplit.py"
+	conda:
+		"bbmap.yaml"
+	resources:
+		slurm_extra="--mail-type=ALL --mail-user=stu203329@mail.uni-kiel.de --array 0-51"
+	shell:
+		"""
+		#TODO MANUALLY EDIT THE ARRAY SIZE PLEASE
+		#TODO IS THIS A BAD IDEA?  DELETING LOGS WITHOUT USER PERM
+		#ES GIBT --array wir koennte da die lines count passen
+		#TODO ADD pATH FOR SLURM ERRORS AS pARAMETER
+		sbatch "scripts/bash/slurm/run_bbsplit.sh" {sample_list} {read_folder} {out_folder}
+		#TODO WHY DOES THIS NOT WORK
+		mv {out_folder}/splited-* {out_folder}/slurm_out/reads_to_bins/
+		"""
+
+rule map_mapped_bin_reads_to_16s:
+	input:
+		expand("{folder}/{t}", t = read_bins(), folder=bin_folder)
+	output: 
+		#EXPAND OUTPUT AND SEE 
+	resources:
+		slurm_extra="--mail-type=ALL --mail-user=stu203329@mail.uni-kiel.de --array 0-180"
+	shell:
+		"""
+		#TODO MANUALLY EDIT THE ARRAY SIZE PLEASE
+		#TODO IS THIS A BAD IDEA?  DELETING LOGS WITHOUT USER PERM
+		#ES GIBT --array wir koennte da die lines count passen
+		#TODO ADD pATH FOR SLURM ERRORS AS pARAMETER
+		sbatch "scripts/bash/slurm/map_mapped_bin_reads_to_16s.sh" \
+			{input}
+		#TODO WHY DOES THIS NOT WORK
+		#mv {out_folder}/splited-* {out_folder}/slurm_out/reads_to_bins/
+		"""
+rule summarize_bin_16s_align_statistics:
+	input:
+		directory("statsfiles-unpaired-all/"),
+I		directory("scafstats-statsfiles-unpaired-all/"),
+		directory("cov-statsfiles-unpaired-all/"),
+		directory("rpkm-statsfiles-unpaired-all/")
+	output:
+		
+
 
 #rule map_reads_to_bins:
 #	input:
@@ -184,19 +223,6 @@ rule map_reads_to_bins:
 #		#runtime: '24:00:00'
 #	conda:
 #		"bbmap.yaml"
-#	shell:
 #		"""
-#		folder={read_folder}
-#		input={input[0]}
-#		while IFS= read -r line
-#		do
-#		  echo "$line"
-#		mkdir "splited-read-${{line}}"
-#		bbsplit.sh -Xmx15g usejni=t unpigz=t threads=2 minid=0.90 ambiguous2=toss  \
-#		path={out_folder}/bin_index/ \
-#		in="${{folder}}/${{line}}/filter/${{line}}_r1_nohost.fastq.gz" \
-#		in2="${{folder}}/${{line}}/filter/${{line}}_r2_nohost.fastq.gz" \
-#		basename=./splited-read-${{line}}/%.out.fastq.gz 
-#		done < "$input"
 #
-#		"""
+#
