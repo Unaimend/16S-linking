@@ -16,7 +16,7 @@ for i in *.scafstats
 do
 echo $i
 echo "Sample" > 00000.tmp
-tail -n+2 $i | cut -f1 >> 00000.tmp
+tail -n+2 $i | cut -f1 | cut -d' ' -f1 >> 00000.tmp
 break
 done
 

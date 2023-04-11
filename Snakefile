@@ -296,10 +296,11 @@ rule create_bin_metadata:
 	output: "BinMetaData.csv"
 	shell:
 		"""
+			echo -e "BinID\tgenome size bp" > BinMetaData.csv
 			for item in {input}; do
 				echo $item
 				BinFileName=${{item##*/}}
-				BinName=${{BinFileName%.*}}
+				BinName=${{BinFileName}}
 				echo $BinName
 				fgrep -v ">" ${{item}} | wc -m | sed -e "s/^/${{BinName}}\t/" >> BinMetaData.csv
 			done
