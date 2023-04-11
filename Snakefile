@@ -75,6 +75,7 @@ def read_bins():
 
 #use checkpoints for paralel.. https://stackoverflow.com/questions/57925104/snakemake-running-single-jobs-in-parallel-from-all-files-in-folder
 #TALK WITH LENA AGAIN: PROPER RENAMIN_G
+#TODO LATER IN THE DOC. WE DO CREATE CONDUCTED BINS I>E> RENAME THEM IN THE BELOW FASHION AND MERGE THEM. SO MAYBE THIS IS UNNCECESSARY
 rule rename_read_ids:
 	input:
 		#Maybe use glob wildcards https://carpentries-incubator.github.io/snakemake-novice-bioinformatics/05-expansion/index.html
@@ -160,7 +161,7 @@ rule bbsplit_bin_index:
 
 def read_bins2():
 	with open(str(sample_list), "r") as f:
-    		return f.read().splitlines()
+		return f.read().splitlines()
 
 
 # Maps reads from all the samples to all bins
@@ -203,26 +204,57 @@ rule map_mapped_bin_reads_to_16s:
 		#TODO WHY DOES THIS NOT WORK
 		#mv {out_folder}/splited-* {out_folder}/slurm_out/reads_to_bins/
 		"""
+#TODO WILL NET 
 rule summarize_bin_16s_align_statistics:
+	#Not way to specifiy a dir as input?
 	input:
-		directory("statsfiles-unpaired-all/"),
-I		directory("scafstats-statsfiles-unpaired-all/"),
-		directory("cov-statsfiles-unpaired-all/"),
-		directory("rpkm-statsfiles-unpaired-all/")
+	
+	params:
+		path =  "scafstats-statsfiles-unpaired-all/"
+	conda:
+		"test.yaml"
+	shell:
+		"python3 scripts/python/make-splitmapping-stats.py"
+
+
+
+rule create_16s_abund:
+	output: 
+		directory("16SrRNA-cov-statsfiles"),
+		directory("16SrRNA-rpkm-statsfiles"),
+		directory("16SrRNA-scafstats-statsfiles"),
+		directory("16SrRNA-statsfiles")
+	params:
+		samples=read_bins2(),
+		read_path={read_folder}
+	conda:
+		"bbmap.yaml"
+	resources:
+		slurm_extra="--mail-type=ALL --mail-user=stu203329@mail.uni-kiel.de --array 1-52" #52
+	shell:
+		""" #TODO THIS IS WRONG DO MNOT USE sbatch THIS CIRCUMVENTS SNAKEMAKES MECHANISM
+		sbatch "scripts/bash/slurm/create_16s_abund_over_sampls.sh" {params.read_path} {params.samples} 
+		"""
+
+rule summarize_16S_abundance_statistics:
+	input:
+		expand("{folder}/{t}.scafstats", t = read_bins2(), folder="16SrRNA-scafstats-statsfiles")
 	output:
-		
+		"16S-abundances.tab"
+	shell:
+		"""
+			"scripts/bash/make-16S-mapping-stats.sh"
+		"""		
+	
 
 
-#rule map_reads_to_bins:
-#	input:
-#		sample_list	
-#	#output:
-#	threads: 2
-#	resources:
-#		slurm_extra="--cpus-per-task=20 --mem=300GB --qos=normal --mail-type=ALL --mail-user=stu203329@mail.uni-kiel.de"
-#		#runtime: '24:00:00'
-#	conda:
-#		"bbmap.yaml"
-#		"""
-#
-#
+rule create_ref_over_pooled_bins:
+	input:
+		#### POOLED & RENAMED BINS BINS
+		#TODO BBMAP DIES WHEN USING LEADING /
+		"renamed_bins/pooled.fa"
+	conda:
+		"bbmap.yaml"
+	shell: "bbmap.sh ref={input}"
+
+	
