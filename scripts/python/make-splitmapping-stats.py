@@ -21,7 +21,7 @@ def main(args):
         df = pd.read_csv(f, sep='\t')
         df = df[["#name", "unambiguousReads"]]
         df["#name"] = df["#name"].str.split(pat=" ", expand=True)[0]
-        binName = getBinName(f)
+        binName = getBinName(f) + ".fa"
         df = df.rename(columns={"#name" : "#name", "unambiguousReads" : binName})
 
         # Change name on the second colum to the binname so we can identify to which bin the amount of reads belongs

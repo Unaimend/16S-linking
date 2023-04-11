@@ -212,7 +212,7 @@ rule summarize_bin_16s_align_statistics:
 	params:
 		path =  "scafstats-statsfiles-unpaired-all/"
 	conda:
-		"test.yaml"
+		"summarize_16S.yaml"
 	shell:
 		"python3 scripts/python/make-splitmapping-stats.py"
 
