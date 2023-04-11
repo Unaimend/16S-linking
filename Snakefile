@@ -258,3 +258,49 @@ rule create_ref_over_pooled_bins:
 	shell: "bbmap.sh ref={input}"
 
 	
+
+
+rule create_bin_abund:
+	#output: 
+	#	directory("bin-statsfiles"),
+	#	directory("bin-cov-statsfiles"),
+	#	directory("bin-scafstats-statsfiles"),
+	#	directory("bin-rpkm-statsfiles")
+	params:
+		samples=read_bins2(),
+		read_path={read_folder}
+	conda:
+		"bbmap.yaml"
+	resources:
+		slurm_extra="--mail-type=ALL --mail-user=stu203329@mail.uni-kiel.de --array 1-52 -e  /zfshome/sukem127/e_%A_%a.log  -o  /zfshome/sukem127/o_%A_%a.log" #52
+	shell:
+		""" #TODO THIS IS WRONG DO MNOT USE sbatch THIS CIRCUMVENTS SNAKEMAKES MECHANISM
+		sbatch "scripts/bash/slurm/create_bin_abund_over_sample.sh" {params.read_path} {params.samples} 
+		"""
+
+
+
+rule summarize_bin_abundance_statistics:
+	input:
+		expand("{folder}/{t}.scafstats", t = read_bins2(), folder="bin-scafstats-statsfiles")
+	output:
+		"bin-abundances.tab"
+	shell:
+		"""
+			"scripts/bash/make-bin-mapping-stats.sh"
+		"""		
+
+rule create_bin_metadata:
+	input: 
+		expand("{folder}/{t}", t = read_bins(), folder=bin_folder)
+	output: "BinMetaData.csv"
+	shell:
+		"""
+			for item in {input}; do
+				echo $item
+				BinFileName=${{item##*/}}
+				BinName=${{BinFileName%.*}}
+				echo $BinName
+				fgrep -v ">" ${{item}} | wc -m | sed -e "s/^/${{BinName}}\t/" >> BinMetaData.csv
+			done
+		"""		
