@@ -192,7 +192,7 @@ rule map_mapped_bin_reads_to_16s:
 	output: 
 		#EXPAND OUTPUT AND SEE 
 	resources:
-		slurm_extra="--mail-type=ALL --mail-user=stu203329@mail.uni-kiel.de --array 0-180"
+		slurm_extra="--mail-type=ALL --mail-user=stu203329@mail.uni-kiel.de --array 0-182 -e  /zfshome/sukem127/e_%A_%a.log  -o  /zfshome/sukem127/o_%A_%a.log"
 	shell:
 		"""
 		#TODO MANUALLY EDIT THE ARRAY SIZE PLEASE
@@ -214,6 +214,7 @@ rule summarize_bin_16s_align_statistics:
 	conda:
 		"summarize_16S.yaml"
 	shell:
+		#TODO THERE IS A HARDCODED PATH IN THE SCRIPT
 		"python3 scripts/python/make-splitmapping-stats.py"
 
 

@@ -14,7 +14,8 @@ def main(args):
     path =  "/work_beegfs/sukem127/clean/16ss/scafstats-statsfiles-unpaired-all/" #args[0]
     # Read files into a list of pandas  frames
     onlyfiles = list(map(lambda x: path + "/" + x, [f for f in listdir(path) if isfile(join(path, f))]))
-    print(onlyfiles)
+    #print(onlyfiles)
+    print("L" + str(len(onlyfiles)))
     dfs = list()
     # open files and read them into a df
     for f in onlyfiles:
@@ -30,7 +31,7 @@ def main(args):
 
     df = dfs[0]
     for i in range(1, len(dfs) ):
-        print("merging "   + str(i))
+        #print("merging "   + str(i))
         df1 = dfs[i]
 
         df = df.merge(df1, on="#name")

@@ -117,7 +117,10 @@ print(S16_file_name)
   bm1=bm/max(sort(apply(bm,1,sum)))
   
   sym_diff <- function(a,b) setdiff(union(a,b), intersect(a,b))
-  #FAIl
+  # WHY IS THERE A BIN MISSING. PYTHON LOG ALSO SAYS MERGING 179 AT THE END BUT I WOULD EXPECT 180
+  "metabat.3.fa" %in% colnames(S16_mg_corrInt)
+  "metabat.3.fa" %in% colnames(map_unambiguous_norm)
+  length(colnames(map_unambiguous_norm))
   sym_diff(colnames(S16_mg_corrInt), colnames(map_unambiguous_norm))
   sym_diff(rownames(S16_mg_corrInt), rownames(map_unambiguous_norm))
   sym_diff(colnames(S16_mg_corrInt), colnames(bm1))
