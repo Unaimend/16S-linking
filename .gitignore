@@ -35,4 +35,9 @@ bin-rpkm-statsfiles/
 bin-scafstats-statsfiles/
 bin-statsfiles/
 ref/
+scripts/R/.RData
+scripts/R/.Rhistory
+scripts/R/top_hits_all_16S.rds
+scripts/R/top_hits_all_meta.rds
+
 

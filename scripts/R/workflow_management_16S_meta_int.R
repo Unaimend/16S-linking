@@ -144,8 +144,8 @@ print(S16_file_name)
   
   
   
-  saveRDS(str_join(res_folder,"/top_hits_all_meta.rds"),top_hits_all)
-  saveRDS(str_join(res_folder,"/top_hits_all_16S.rds"),top_hits_all16S)
+  saveRDS(file = "top_hits_all_meta.rds",top_hits_all)
+  saveRDS(file = "top_hits_all_16S.rds",top_hits_all16S)
   
 
 pg_nm=ceiling(nrow(top_hits_all)/900)
